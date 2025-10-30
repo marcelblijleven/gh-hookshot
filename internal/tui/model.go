@@ -8,25 +8,22 @@ import (
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/footer"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/header"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/keys"
-	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 )
 
 type Model struct {
-	ctx        *tuicontext.Context
-	repository repository.Model
-	header     header.Model
-	content    content.Model
-	footer     footer.Model
+	ctx     *tuicontext.Context
+	header  header.Model
+	content content.Model
+	footer  footer.Model
 }
 
 func New(ctx *tuicontext.Context) Model {
 	m := Model{
-		ctx:        ctx,
-		repository: repository.New(ctx),
-		header:     header.New(ctx),
-		content:    content.New(ctx),
-		footer:     footer.New(ctx),
+		ctx:     ctx,
+		header:  header.New(ctx),
+		content: content.New(ctx),
+		footer:  footer.New(ctx),
 	}
 	return m
 }
@@ -53,7 +50,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ctx.WindowWidth = msg.Width
 	}
 
-	m.repository, repoCmd = m.repository.Update(msg)
 	m.header, headerCmd = m.header.Update(msg)
 	m.footer, footerCmd = m.footer.Update(msg)
 	// Content height is determined by repo, header and footer so keep
@@ -73,12 +69,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
-		m.repository.Init(),
 		m.header.Init(),
 		m.footer.Init(),
 	)
 }
 
 func (m Model) View() string {
-	return lipgloss.JoinVertical(lipgloss.Center, m.header.View(), m.repository.View(), m.content.View(), m.footer.View())
+	return lipgloss.JoinVertical(lipgloss.Left, m.header.View(), m.content.View(), m.footer.View())
 }

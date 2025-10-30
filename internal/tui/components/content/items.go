@@ -1,6 +1,10 @@
 package content
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/charmbracelet/lipgloss/v2"
 	"github.com/marcelblijleven/gh-hookshot/internal/data"
 )
 
@@ -18,7 +22,7 @@ type HookDeliveryDetailItem struct {
 
 // FilterValue satisfies list.Item
 func (i WebhookItem) FilterValue() string {
-	return i.Config.URL
+	return fmt.Sprintf("%s|%s", i.Config.URL, strings.Join(i.Events, "|"))
 }
 
 // Title satisfies list.DetailItem
@@ -28,7 +32,11 @@ func (i WebhookItem) Title() string {
 
 // Description satisfies list.DetailItem
 func (i WebhookItem) Description() string {
-	return i.Config.URL
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		fmt.Sprintf("Events: %s", strings.Join(i.Events, ", ")),
+		fmt.Sprintf("Last delivery: %s", i.LastResponse.Status),
+	)
 }
 
 // FilterValue satisfies list.Item
@@ -43,7 +51,7 @@ func (i HookDeliveryItem) Title() string {
 
 // Description satisfies list.DetailItem
 func (i HookDeliveryItem) Description() string {
-	return i.Event
+	return fmt.Sprintf("Event: %s", i.Event)
 }
 
 // FilterValue satisfies list.Item

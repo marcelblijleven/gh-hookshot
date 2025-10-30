@@ -1,11 +1,14 @@
 package footer
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
+	"github.com/marcelblijleven/gh-hookshot/internal/util"
 )
 
 type Model struct {
@@ -41,5 +44,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 func (m Model) View() string {
 	helpView := m.help.View(m.ctx.Keys)
-	return helpView
+	padding := strings.Repeat(" ", util.Max(0, (m.ctx.WindowWidth/2)-lipgloss.Width(helpView)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, padding, helpView, padding)
 }

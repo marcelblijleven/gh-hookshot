@@ -14,7 +14,6 @@ type Context struct {
 	Keys         keys.KeyMapping
 
 	HeaderHeight int
-	RepoHeight   int
 	FooterHeight int
 
 	Owner string
@@ -26,5 +25,5 @@ func (c Context) GetFullRepoName() string {
 }
 
 func (c Context) CalculateContentHeight(h int) int {
-	return h - c.HeaderHeight - c.RepoHeight - c.FooterHeight
+	return h - c.HeaderHeight - c.FooterHeight
 }

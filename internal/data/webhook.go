@@ -38,7 +38,7 @@ type HookResponse struct {
 }
 
 type HookDelivery struct {
-	ID             string  `json:"id"`
+	ID             int     `json:"id"`
 	GUID           string  `json:"guid"`
 	DeliveredAt    string  `json:"delivered_at"`
 	Redelivery     bool    `json:"redelivery"`

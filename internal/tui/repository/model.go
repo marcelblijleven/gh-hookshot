@@ -57,7 +57,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			if errors.As(msg.Err, &httpErr) {
 				ret = RepositoryDataMsg{
 					Valid: false,
-					Err:   fmt.Errorf("could not retrieve repository %s (%s)", repoName, httpErr.StatusCode),
+					Err:   fmt.Errorf("could not retrieve repository %s (%d)", repoName, httpErr.StatusCode),
 				}
 			} else {
 				ret = RepositoryDataMsg{
@@ -83,7 +83,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		return m, func() tea.Msg { return ret }
 	}
 
-	m.ctx.RepoHeight = lipgloss.Height(m.View())
 	return m, nil
 }
 
@@ -94,7 +93,5 @@ func (m Model) View() string {
 	spacing := strings.Repeat(" ", util.Max(0, m.ctx.WindowWidth-lipgloss.Width(repoName)))
 
 	return lipgloss.NewStyle().Width(m.ctx.WindowWidth).
-		PaddingLeft(1).
-		PaddingRight(1).
 		Render(lipgloss.JoinHorizontal(lipgloss.Center, repoName, spacing))
 }

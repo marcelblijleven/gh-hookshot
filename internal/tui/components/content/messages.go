@@ -9,3 +9,8 @@ type deliveriesFetchMsg struct {
 	Deliveries []HookDeliveryItem
 	Err        error
 }
+
+type deliveryDetailFetchMsg struct {
+	DeliveryDetail HookDeliveryDetailItem
+	Err            error
+}
