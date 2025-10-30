@@ -1,35 +1,84 @@
 package tui
 
 import (
-	"os"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/content"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/footer"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/header"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/keys"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 )
 
-type Model struct{}
+type Model struct {
+	ctx        *tuicontext.Context
+	repository repository.Model
+	header     header.Model
+	content    content.Model
+	footer     footer.Model
+}
 
-func NewModel() Model {
-	m := Model{}
+func New(ctx *tuicontext.Context) Model {
+	m := Model{
+		ctx:        ctx,
+		repository: repository.New(ctx),
+		header:     header.New(ctx),
+		content:    content.New(ctx),
+		footer:     footer.New(ctx),
+	}
 	return m
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var (
+		cmd        tea.Cmd
+		repoCmd    tea.Cmd
+		headerCmd  tea.Cmd
+		contentCmd tea.Cmd
+		footerCmd  tea.Cmd
+	)
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		// Key pressed
 		if key.Matches(msg, keys.Keys.Quit) {
-			os.Exit(1)
+			cmd = tea.Quit
 		}
+
+	case tea.WindowSizeMsg:
+		// Initial window size or window resized
+		m.ctx.WindowHeight = msg.Height
+		m.ctx.WindowWidth = msg.Width
 	}
 
-	return m, nil
+	m.repository, repoCmd = m.repository.Update(msg)
+	m.header, headerCmd = m.header.Update(msg)
+	m.footer, footerCmd = m.footer.Update(msg)
+	// Content height is determined by repo, header and footer so keep
+	// this as last
+	m.content, contentCmd = m.content.Update(msg)
+
+	cmds := []tea.Cmd{cmd}
+	cmds = append(cmds,
+		repoCmd,
+		headerCmd,
+		footerCmd,
+		contentCmd,
+	)
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return tea.Batch(
+		m.repository.Init(),
+		m.header.Init(),
+		m.footer.Init(),
+	)
 }
 
 func (m Model) View() string {
-	return ""
+	return lipgloss.JoinVertical(lipgloss.Center, m.header.View(), m.repository.View(), m.content.View(), m.footer.View())
 }
