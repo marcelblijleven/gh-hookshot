@@ -1,9 +1,7 @@
-package data
+package api
 
 import (
 	"fmt"
-
-	"github.com/cli/go-gh/v2/pkg/api"
 )
 
 type Repository struct {
@@ -29,7 +27,7 @@ func (r Repository) IsAdmin() bool {
 func GetRepo(owner, repo string) (Repository, error) {
 	var resp Repository
 
-	client, err := api.DefaultRESTClient()
+	client, err := newRESTClient()
 	if err != nil {
 		return resp, err
 	}

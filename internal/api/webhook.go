@@ -1,11 +1,9 @@
-package data
+package api
 
 import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	"github.com/cli/go-gh/v2/pkg/api"
 )
 
 type Webhook struct {
@@ -67,7 +65,7 @@ type (
 )
 
 func GetWebhooks(owner, repo string, resp interface{}) error {
-	client, err := api.DefaultRESTClient()
+	client, err := newRESTClient()
 	if err != nil {
 		return err
 	}
@@ -76,7 +74,7 @@ func GetWebhooks(owner, repo string, resp interface{}) error {
 }
 
 func GetWebhookDeliveries(owner, repo string, hookID int, resp interface{}) error {
-	client, err := api.DefaultRESTClient()
+	client, err := newRESTClient()
 	if err != nil {
 		return err
 	}
@@ -87,7 +85,7 @@ func GetWebhookDeliveries(owner, repo string, hookID int, resp interface{}) erro
 }
 
 func GetWebhookDeliveryDetail(owner, repo string, hookID, deliveryID int, resp interface{}) error {
-	client, err := api.DefaultRESTClient()
+	client, err := newCacheRESTClient()
 	if err != nil {
 		return err
 	}

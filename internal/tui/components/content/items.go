@@ -5,19 +5,20 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss/v2"
-	"github.com/marcelblijleven/gh-hookshot/internal/data"
+	"github.com/marcelblijleven/gh-hookshot/internal/api"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 )
 
 type WebhookItem struct {
-	data.Webhook
+	api.Webhook
 }
 
 type HookDeliveryItem struct {
-	data.HookDelivery
+	api.HookDelivery
 }
 
 type HookDeliveryDetailItem struct {
-	data.HookDeliveryDetail
+	api.HookDeliveryDetail
 }
 
 // FilterValue satisfies list.Item
@@ -46,6 +47,9 @@ func (i HookDeliveryItem) FilterValue() string {
 
 // Title satisfies list.DetailItem
 func (i HookDeliveryItem) Title() string {
+	if i.Redelivery {
+		return fmt.Sprintf("%s %s", i.DeliveredAt, styles.Repeat)
+	}
 	return i.DeliveredAt
 }
 

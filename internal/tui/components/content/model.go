@@ -1,20 +1,22 @@
 package content
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
+	"github.com/marcelblijleven/gh-hookshot/internal/util"
 	"github.com/marcelblijleven/gh-hookshot/internal/util/markdown"
 )
 
 const (
-	webhooksView int = iota
-	deliveriesView
-	deliveryDetailView
-	totalViews
+	webhooksColumn int = iota
+	deliveriesColumn
+	deliveryDetailColumn
+	totalColumns
 )
 
 type Model struct {
@@ -25,12 +27,12 @@ type Model struct {
 	deliveries     list.Model
 	deliveryDetail viewport.Model
 
-	// Sentinels
 	repoValid          bool
 	webhooksFetched    bool
 	deliveriesFetched  bool
 	selectedWebhookID  int
 	selectedDeliveryID int
+	currentColumn      int
 	err                error
 }
 
@@ -71,15 +73,45 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var (
 		webhookCmd    tea.Cmd
 		deliveriesCmd tea.Cmd
-		tabCmd        tea.Cmd
+		detailCmd     tea.Cmd
 	)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "enter" {
-			// TODO handle per list
-			m.selectedWebhookID = m.webhooks.Items()[m.webhooks.GlobalIndex()].(WebhookItem).ID
-			return m, fetchWebhookDeliveriesCmd(m.ctx.Owner, m.ctx.Repo, m.selectedWebhookID)
+		if key.Matches(msg, m.ctx.Keys.Select) {
 		}
+
+		if key.Matches(msg, m.ctx.Keys.Left) {
+			m.previousColumn()
+		} else if key.Matches(msg, m.ctx.Keys.Right) {
+			m.nextColumn()
+		}
+
+		switch m.currentColumn {
+		case webhooksColumn:
+			m.webhooks, webhookCmd = m.webhooks.Update(msg)
+			if key.Matches(msg, m.ctx.Keys.Select) {
+				item, ok := util.GetFromSlice[list.Item](m.webhooks.Items(), m.webhooks.GlobalIndex())
+				if ok {
+					m.selectedWebhookID = item.(WebhookItem).ID
+					return m, tea.Batch(webhookCmd, fetchWebhookDeliveriesCmd(m.ctx.Owner, m.ctx.Repo, m.selectedWebhookID))
+
+				}
+			}
+		case deliveriesColumn:
+			m.deliveries, deliveriesCmd = m.deliveries.Update(msg)
+			if key.Matches(msg, m.ctx.Keys.Select) {
+				item, ok := util.GetFromSlice[list.Item](m.deliveries.Items(), m.deliveries.GlobalIndex())
+				if ok {
+					m.selectedDeliveryID = item.(HookDeliveryItem).ID
+					return m, tea.Batch(deliveriesCmd, fetchWebhookDeliveryDetailCmd(m.ctx.Owner, m.ctx.Repo, m.selectedWebhookID, m.selectedDeliveryID))
+				}
+			}
+		case deliveryDetailColumn:
+			m.deliveryDetail, detailCmd = m.deliveryDetail.Update(msg)
+		}
+
+		return m, tea.Batch(webhookCmd, deliveriesCmd, detailCmd)
+
 	case tea.WindowSizeMsg:
 		m.height = m.ctx.CalculateContentHeight(msg.Height)
 		m.webhooks.SetSize(msg.Width/3, m.height)
@@ -112,7 +144,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 		if len(m.webhooks.Items()) > 0 {
 			m.selectedWebhookID = m.webhooks.SelectedItem().(WebhookItem).ID
-
 			return m, fetchWebhookDeliveriesCmd(m.ctx.Owner, m.ctx.Repo, m.selectedWebhookID)
 
 		}
@@ -134,6 +165,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.selectedDeliveryID = m.deliveries.SelectedItem().(HookDeliveryItem).ID
 			return m, fetchWebhookDeliveryDetailCmd(m.ctx.Owner, m.ctx.Repo, m.selectedWebhookID, m.selectedDeliveryID)
 		}
+
 	case deliveryDetailFetchMsg:
 		if msg.Err != nil {
 			m.err = msg.Err
@@ -151,8 +183,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	m.webhooks, webhookCmd = m.webhooks.Update(msg)
 	m.deliveries, deliveriesCmd = m.deliveries.Update(msg)
+	m.deliveryDetail, detailCmd = m.deliveryDetail.Update(msg)
 
-	return m, tea.Batch(tabCmd, webhookCmd, deliveriesCmd)
+	return m, tea.Batch(webhookCmd, deliveriesCmd, detailCmd)
 }
 
 func (m Model) View() string {
@@ -177,24 +210,24 @@ func (m Model) renderColumns() string {
 }
 
 func (m Model) renderWebhookColumn() string {
-	title := "Webhooks"
+	title := getTitleStyle(webhooksColumn, m.currentColumn).Render("Webhooks")
 	width, _, _ := m.columnWidths()
 	column := lipgloss.NewStyle().Width(width)
-	return lipgloss.JoinVertical(lipgloss.Left, titleStyle.Render(title), column.Render(m.webhooks.View()))
+	return lipgloss.JoinVertical(lipgloss.Left, title, column.Render(m.webhooks.View()))
 }
 
 func (m Model) renderDeliveriesColumn() string {
-	title := "Deliveries"
+	title := getTitleStyle(deliveriesColumn, m.currentColumn).Render("Deliveries")
 	_, width, _ := m.columnWidths()
 	column := lipgloss.NewStyle().Width(width)
-	return lipgloss.JoinVertical(lipgloss.Left, titleStyle.Render(title), column.Render(m.deliveries.View()))
+	return lipgloss.JoinVertical(lipgloss.Left, title, column.Render(m.deliveries.View()))
 }
 
 func (m Model) renderDetailColumn() string {
-	title := "Delivery detail"
+	title := getTitleStyle(deliveryDetailColumn, m.currentColumn).Render("Delivery detail")
 	_, _, width := m.columnWidths()
 	column := lipgloss.NewStyle().Width(width)
-	return lipgloss.JoinVertical(lipgloss.Left, titleStyle.Render(title), column.Render(m.deliveryDetail.View()))
+	return lipgloss.JoinVertical(lipgloss.Left, title, column.Render(m.deliveryDetail.View()))
 }
 
 func (m Model) columnWidths() (int, int, int) {
@@ -203,4 +236,16 @@ func (m Model) columnWidths() (int, int, int) {
 	parts := windowWidth / 5
 
 	return parts * 2, parts * 1, parts * 3
+}
+
+func (m *Model) nextColumn() {
+	if m.currentColumn < totalColumns-1 {
+		m.currentColumn++
+	}
+}
+
+func (m *Model) previousColumn() {
+	if m.currentColumn > 0 {
+		m.currentColumn--
+	}
 }

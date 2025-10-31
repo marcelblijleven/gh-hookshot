@@ -2,14 +2,14 @@ package content
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/marcelblijleven/gh-hookshot/internal/data"
+	"github.com/marcelblijleven/gh-hookshot/internal/api"
 )
 
 func fetchWebhooksCmd(owner, repo string) tea.Cmd {
 	return func() tea.Msg {
 		var resp []WebhookItem
 
-		if err := data.GetWebhooks(owner, repo, &resp); err != nil {
+		if err := api.GetWebhooks(owner, repo, &resp); err != nil {
 			return webhooksFetchMsg{Err: err}
 		}
 
@@ -21,7 +21,7 @@ func fetchWebhookDeliveriesCmd(owner, repo string, hookId int) tea.Cmd {
 	return func() tea.Msg {
 		var resp []HookDeliveryItem
 
-		if err := data.GetWebhookDeliveries(owner, repo, hookId, &resp); err != nil {
+		if err := api.GetWebhookDeliveries(owner, repo, hookId, &resp); err != nil {
 			return deliveriesFetchMsg{Err: err}
 		}
 
@@ -33,7 +33,7 @@ func fetchWebhookDeliveryDetailCmd(owner, repo string, hookID, deliveryID int) t
 	return func() tea.Msg {
 		var resp HookDeliveryDetailItem
 
-		if err := data.GetWebhookDeliveryDetail(owner, repo, hookID, deliveryID, &resp); err != nil {
+		if err := api.GetWebhookDeliveryDetail(owner, repo, hookID, deliveryID, &resp); err != nil {
 			return deliveryDetailFetchMsg{Err: err}
 		}
 

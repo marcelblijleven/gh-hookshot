@@ -1,9 +1,9 @@
 package repository
 
-import "github.com/marcelblijleven/gh-hookshot/internal/data"
+import "github.com/marcelblijleven/gh-hookshot/internal/api"
 
 type dataFetchMsg struct {
-	Repo data.Repository
+	Repo api.Repository
 	Err  error
 }
 
