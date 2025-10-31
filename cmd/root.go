@@ -10,6 +10,8 @@ import (
 	"github.com/charmbracelet/fang"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/keys"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 	"github.com/muesli/termenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,6 +19,8 @@ import (
 
 var (
 	cfgFile string
+	owner   string
+	repo    string
 	Version = "dev"
 )
 
@@ -28,7 +32,13 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lipgloss.SetHasDarkBackground(termenv.HasDarkBackground())
 
-		model := tui.NewModel()
+		ctx := &tuicontext.Context{
+			Owner:   owner,
+			Repo:    repo,
+			Version: Version,
+			Keys:    *keys.Keys,
+		}
+		model := tui.New(ctx)
 
 		p := tea.NewProgram(
 			model,
@@ -54,14 +64,10 @@ func init() {
 
 	rootCmd.Version = Version
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gh-hookshot.yaml)")
+	rootCmd.PersistentFlags().StringVar(&owner, "owner", "", "specify the owner of the repository")
+	rootCmd.PersistentFlags().StringVar(&repo, "repo", "", "specify the name of the repository")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
