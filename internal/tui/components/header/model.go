@@ -36,16 +36,23 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	frame := lipgloss.NewStyle().Width(m.ctx.WindowWidth).Padding(1, 3, 1, 3)
+	frameWidth, _ := frame.GetFrameSize()
 	logo := lipgloss.NewStyle().Bold(true).Render("Hookshot 🏹")
 
 	version := lipgloss.NewStyle().Foreground(styles.ColorGray).Render(m.ctx.Version)
 	spacing := strings.Repeat(
 		" ",
-		util.Max(0, m.ctx.WindowWidth-2-lipgloss.Width(logo)-lipgloss.Width(version)),
+		util.Max(0, m.ctx.WindowWidth-frameWidth-lipgloss.Width(logo)-lipgloss.Width(version)),
 	)
 	spacing = lipgloss.NewStyle().Foreground(styles.ColorGray).Render(spacing)
 
-	return lipgloss.NewStyle().Width(m.ctx.WindowWidth).
-		Padding(1).
-		Render(lipgloss.JoinVertical(lipgloss.Left, lipgloss.JoinHorizontal(lipgloss.Center, logo, spacing, version), m.repository.View()))
+	return frame.Render(lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			logo,
+			spacing,
+			version),
+		m.repository.View()))
 }
