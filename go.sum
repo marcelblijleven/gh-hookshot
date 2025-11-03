@@ -74,6 +74,16 @@ github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69
 github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/lucasb-eyer/go-colorful v1.3.0 h1:2/yBRLdWBZKrf7gB40FoiKfAWYQ0lqNcbuQwVHXptag=
 github.com/lucasb-eyer/go-colorful v1.3.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
+github.com/marcelblijleven/bubbles-hlist v0.0.0-20251031211723-61410ab3dcfb h1:Bv3ig+HWJxF8H4TymUcPAT7xfBUMSr31HPrFk0gQHaI=
+github.com/marcelblijleven/bubbles-hlist v0.0.0-20251031211723-61410ab3dcfb/go.mod h1:JDop6IzJkLu779kXfWQFJxq1rth48KhTISKPdWfEEwk=
+github.com/marcelblijleven/bubbles-hlist v1.0.0 h1:h22w1l+klHbHU9xHNt5TUQ7qY2CGjtmTsZNXz7y6OSk=
+github.com/marcelblijleven/bubbles-hlist v1.0.0/go.mod h1:JDop6IzJkLu779kXfWQFJxq1rth48KhTISKPdWfEEwk=
+github.com/marcelblijleven/bubbles-hlist v1.0.1 h1:3gXmlncDi2adBLCBF766Pchk5tjnw7FLLvw60n7RMo0=
+github.com/marcelblijleven/bubbles-hlist v1.0.1/go.mod h1:JDop6IzJkLu779kXfWQFJxq1rth48KhTISKPdWfEEwk=
+github.com/marcelblijleven/bubbles-hlist v1.0.2 h1:Uov8lWIJlRdtB12tuxzF2SCzpEP5BuNSccEn+6BKIB4=
+github.com/marcelblijleven/bubbles-hlist v1.0.2/go.mod h1:JDop6IzJkLu779kXfWQFJxq1rth48KhTISKPdWfEEwk=
+github.com/marcelblijleven/bubbles-hlist v1.0.3 h1:36hrn77UJrihvLhtnkWklcjKjozANhaI3FFZIkCQ9Fg=
+github.com/marcelblijleven/bubbles-hlist v1.0.3/go.mod h1:JDop6IzJkLu779kXfWQFJxq1rth48KhTISKPdWfEEwk=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/mattn/go-localereader v0.0.1 h1:ygSAOl7ZXTx4RdPYinUpg6W99U8jWvWi9Ye2JC/oIi4=

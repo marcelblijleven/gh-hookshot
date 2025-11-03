@@ -36,7 +36,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	frame := lipgloss.NewStyle().Width(m.ctx.WindowWidth).Padding(1, 3, 1, 3)
+	frame := lipgloss.NewStyle().Width(m.ctx.WindowWidth).Padding(1, 2, 1, 2)
 	frameWidth, _ := frame.GetFrameSize()
 	logo := lipgloss.NewStyle().Bold(true).Render("Hookshot 🏹")
 

@@ -13,11 +13,14 @@ type Context struct {
 	WindowHeight int
 	Keys         keys.KeyMapping
 
-	HeaderHeight int
-	FooterHeight int
+	HeaderHeight   int
+	WebhooksHeight int
+	FooterHeight   int
 
-	Owner string
-	Repo  string
+	Owner              string
+	Repo               string
+	SelectedWebhookID  int
+	SelectedDeliveryID int
 }
 
 func (c Context) GetFullRepoName() string {
