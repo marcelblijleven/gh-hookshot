@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
@@ -36,16 +36,23 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	frame := lipgloss.NewStyle().Width(m.ctx.WindowWidth).Padding(1, 2, 1, 2)
+	frameWidth, _ := frame.GetFrameSize()
 	logo := lipgloss.NewStyle().Bold(true).Render("Hookshot 🏹")
 
 	version := lipgloss.NewStyle().Foreground(styles.ColorGray).Render(m.ctx.Version)
 	spacing := strings.Repeat(
 		" ",
-		util.Max(0, m.ctx.WindowWidth-2-lipgloss.Width(logo)-lipgloss.Width(version)),
+		util.Max(0, m.ctx.WindowWidth-frameWidth-lipgloss.Width(logo)-lipgloss.Width(version)),
 	)
 	spacing = lipgloss.NewStyle().Foreground(styles.ColorGray).Render(spacing)
 
-	return lipgloss.NewStyle().Width(m.ctx.WindowWidth).
-		Padding(1).
-		Render(lipgloss.JoinVertical(lipgloss.Left, lipgloss.JoinHorizontal(lipgloss.Center, logo, spacing, version), m.repository.View()))
+	return frame.Render(lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			logo,
+			spacing,
+			version),
+		m.repository.View()))
 }
