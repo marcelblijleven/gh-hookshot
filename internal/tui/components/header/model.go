@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"

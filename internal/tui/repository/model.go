@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/lipgloss"
 	gh "github.com/cli/go-gh/v2/pkg/api"
 	"github.com/marcelblijleven/gh-hookshot/internal/api"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"

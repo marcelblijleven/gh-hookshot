@@ -3,18 +3,13 @@ package webhooks
 import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/marcelblijleven/bubbles-hlist/hlist"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/keys"
 )
 
 var KeyMap = hlist.KeyMap{
 	// Browsing.
-	CursorLeft: key.NewBinding(
-		key.WithKeys("["),
-		key.WithHelp("←", "left"),
-	),
-	CursorRight: key.NewBinding(
-		key.WithKeys("]"),
-		key.WithHelp("→", "right"),
-	),
+	CursorLeft:  keys.Keys.HookLeft,
+	CursorRight: keys.Keys.HookRight,
 	PrevPage: key.NewBinding(
 		key.WithKeys("<"),
 		key.WithHelp("<", "prev page"),

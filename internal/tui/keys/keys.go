@@ -3,13 +3,14 @@ package keys
 import "github.com/charmbracelet/bubbles/key"
 
 type KeyMapping struct {
-	Up     key.Binding
-	Down   key.Binding
-	Left   key.Binding
-	Right  key.Binding
-	Select key.Binding
-	Help   key.Binding
-	Quit   key.Binding
+	Up        key.Binding
+	Down      key.Binding
+	Left      key.Binding
+	Right     key.Binding
+	HookLeft  key.Binding
+	HookRight key.Binding
+	Help      key.Binding
+	Quit      key.Binding
 }
 
 // ShortHelp returns keybindings to be shown in the mini help view
@@ -21,7 +22,7 @@ func (k KeyMapping) ShortHelp() []key.Binding {
 func (k KeyMapping) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Up, k.Down, k.Left, k.Right},
-		{k.Select},
+		{k.HookLeft, k.HookRight},
 		{k.Help, k.Quit},
 	}
 }
@@ -43,9 +44,13 @@ var Keys = &KeyMapping{
 		key.WithKeys("right", "l"),
 		key.WithHelp("→/l", "move right"),
 	),
-	Select: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("enter", "select"),
+	HookLeft: key.NewBinding(
+		key.WithKeys("["),
+		key.WithHelp("[", "move hook left"),
+	),
+	HookRight: key.NewBinding(
+		key.WithKeys("]"),
+		key.WithHelp("]", "move hook right"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),

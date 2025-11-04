@@ -1,6 +1,6 @@
 package deliverydetail
 
 type deliveryDetailFetchMsg struct {
-	DeliveryDetail HookDeliveryDetailItem
+	DeliveryDetail hookDeliveryDetailItem
 	Err            error
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/bubbles-hlist/hlist"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/deliveries"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
@@ -21,8 +21,8 @@ type Model struct {
 
 func New(ctx *tuicontext.Context) Model {
 	delegate := hlist.NewDefaultDelegate()
-	delegate.SetHeight(2) // Note: ideally this is 3, but there's a bug in hlist
-	delegate.SetWidth(50)
+	delegate.SetHeight(3)
+	delegate.SetWidth(40)
 
 	hooks := hlist.New([]hlist.Item{}, delegate, 0, 0)
 	hooks.Title = "Webhooks"
@@ -49,7 +49,21 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		// Only allow [ and ] for this model
 		if m.hooksFetched && key.Matches(msg, KeyMap.CursorLeft, KeyMap.CursorRight) {
 			m.hooks, hooksCmd = m.hooks.Update(msg)
-			// TODO select new webhook if idx changed
+			item := m.hooks.SelectedItem()
+			if item != nil {
+				hookID := item.(WebhookItem).ID
+				if hookID != m.ctx.SelectedWebhookID {
+					m.ctx.SelectedWebhookID = hookID
+					return m, tea.Batch(
+						hooksCmd,
+						deliveries.FetchWebhookDeliveriesCmd(
+							m.ctx.Owner,
+							m.ctx.Repo,
+							hookID,
+						),
+					)
+				}
+			}
 		}
 	case webhooksFetchMsg:
 		m.hooksFetched = true

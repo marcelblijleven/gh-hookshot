@@ -1,6 +1,7 @@
 package deliveries
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/deliverydetail"
@@ -35,6 +36,18 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var listCmd tea.Cmd
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if key.Matches(msg, m.ctx.Keys.Up, m.ctx.Keys.Down) {
+			m.deliveries, listCmd = m.deliveries.Update(msg)
+
+			if m.deliveries.SelectedItem() != nil {
+				selectedId := m.deliveries.SelectedItem().(hookDeliveryItem).ID
+				if selectedId != m.ctx.SelectedDeliveryID {
+					m.ctx.SelectedDeliveryID = m.deliveries.SelectedItem().(hookDeliveryItem).ID
+					return m, tea.Batch(listCmd, deliverydetail.FetchWebhookDeliveryDetailCmd(m.ctx.Owner, m.ctx.Repo, m.ctx.SelectedWebhookID, m.ctx.SelectedDeliveryID))
+				}
+			}
+		}
 	case deliveriesFetchMsg:
 		m.deliveriesFetched = true
 		if msg.Err != nil {
@@ -60,9 +73,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	if len(m.deliveries.Items()) == 0 {
+		return ""
+	}
 	return m.deliveries.View()
 }
 
 func (m *Model) SetSize(width, height int) {
-	m.deliveries.SetSize(width, height)
+	m.deliveries.SetSize(50, height)
 }

@@ -7,7 +7,7 @@ import (
 
 func FetchWebhookDeliveryDetailCmd(owner, repo string, hookID, deliveryID int) tea.Cmd {
 	return func() tea.Msg {
-		var resp HookDeliveryDetailItem
+		var resp hookDeliveryDetailItem
 
 		if err := api.GetWebhookDeliveryDetail(owner, repo, hookID, deliveryID, &resp); err != nil {
 			return deliveryDetailFetchMsg{Err: err}

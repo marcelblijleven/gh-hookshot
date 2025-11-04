@@ -2,21 +2,21 @@ package deliverydetail
 
 import "github.com/marcelblijleven/gh-hookshot/internal/api"
 
-type HookDeliveryDetailItem struct {
+type hookDeliveryDetailItem struct {
 	api.HookDeliveryDetail
 }
 
 // FilterValue satisfies list.Item
-func (i HookDeliveryDetailItem) FilterValue() string {
+func (i hookDeliveryDetailItem) FilterValue() string {
 	return i.Event
 }
 
 // Title satisfies list.DetailItem
-func (i HookDeliveryDetailItem) Title() string {
+func (i hookDeliveryDetailItem) Title() string {
 	return i.DeliveredAt
 }
 
 // Description satisfies list.DetailItem
-func (i HookDeliveryDetailItem) Description() string {
+func (i hookDeliveryDetailItem) Description() string {
 	return i.GUID
 }
