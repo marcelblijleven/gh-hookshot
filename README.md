@@ -33,7 +33,7 @@ Available flags:
 ### Keybindings
 
 * Move: `↑/k` `↓/j` `←/h` `→/l`
-* Select: `Enter`
+* Move between webhooks: `[` `]`
 * Toggle Help: `?`
 * Quit: `q` `esc` `ctrl+c`
 
@@ -43,11 +43,11 @@ Available flags:
 * **Browse deliveries** per webhook (including redeliveries)
 * **View delivery details** (JSON request/response rendered nicely in the terminal)
 
-### Upcoming features
+### Upcoming features and changes
 
 * [ ] Redeliver deliveries
 * [ ] Copy delivery content to clipboard
-* [ ] Layout improvements
+* [x] Layout improvements
 * [ ] Determine owner/repo based on active git directory
 
 ## Installation
