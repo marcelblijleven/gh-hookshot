@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 )
 

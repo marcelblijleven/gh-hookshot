@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss/v2"
-	"github.com/cli/go-gh/v2/pkg/api"
-	api1 "github.com/marcelblijleven/gh-hookshot/internal/api"
+	"github.com/charmbracelet/lipgloss"
+	gh "github.com/cli/go-gh/v2/pkg/api"
+	"github.com/marcelblijleven/gh-hookshot/internal/api"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 	"github.com/marcelblijleven/gh-hookshot/internal/util"
@@ -16,7 +16,7 @@ import (
 
 type Model struct {
 	ctx  *tuicontext.Context
-	repo api1.Repository
+	repo api.Repository
 	err  error
 }
 
@@ -28,7 +28,7 @@ func New(ctx *tuicontext.Context) Model {
 
 func (m Model) Init() tea.Cmd {
 	fetchRepo := func() tea.Msg {
-		repo, err := api1.GetRepo(m.ctx.Owner, m.ctx.Repo)
+		repo, err := api.GetRepo(m.ctx.Owner, m.ctx.Repo)
 		if err != nil {
 			return dataFetchMsg{
 				Err: err,
@@ -51,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		repoName := m.ctx.GetFullRepoName()
 
 		if msg.Err != nil {
-			var httpErr *api.HTTPError
+			var httpErr *gh.HTTPError
 
 			m.err = msg.Err
 			if errors.As(msg.Err, &httpErr) {
