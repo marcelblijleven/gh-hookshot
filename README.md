@@ -8,6 +8,8 @@ see <b>deliveries</b>, and inspect <b>payloads/responses</b>.
   <img src="https://img.shields.io/github/release/marcelblijleven/gh-hookshot.svg" alt="Latest Release">
 </p>
 
+![GIF that shows usage of gh hookshot command](https://github.com/marcelblijleven/gh-hookshot/blob/main/docs/assets/hookshot.gif)
+
 ## Motivation
 
 I work on applications that rely heavily on GitHub webhooks across hundreds of
