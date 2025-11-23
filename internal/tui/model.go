@@ -11,6 +11,7 @@ import (
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/deliverydetail"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/footer"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/header"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/status"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/webhooks"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/keys"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/repository"
@@ -26,6 +27,7 @@ type Model struct {
 	deliveryDetail deliverydetail.Model
 	footer         footer.Model
 	spinner        spinner.Model
+	status         status.Model
 
 	contentHeight int
 	repoValid     bool
@@ -45,6 +47,7 @@ func New(ctx *tuicontext.Context) Model {
 		deliveryDetail: deliverydetail.New(ctx),
 		footer:         footer.New(ctx),
 		spinner:        s,
+		status:         status.New(ctx),
 	}
 	return m
 }
@@ -58,6 +61,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		deliveryDetailCmd tea.Cmd
 		footerCmd         tea.Cmd
 		spinnerCmd        tea.Cmd
+		statusCmd         tea.Cmd
 	)
 
 	switch msg := msg.(type) {
@@ -73,6 +77,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		if key.Matches(msg, m.ctx.Keys.Right) {
 			m.ctx.NextColumn()
+			return m, status.ShowStatus("This is a longer status message")
 		}
 
 		if m.ctx.IsDeliveriesView() {
@@ -139,6 +144,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.deliveries, deliveriesCmd = m.deliveries.Update(msg)
 		m.deliveryDetail, deliveryDetailCmd = m.deliveryDetail.Update(msg)
 		m.spinner, spinnerCmd = m.spinner.Update(msg)
+		m.status, statusCmd = m.status.Update(msg)
 
 		return m, tea.Batch(
 			cmd,
@@ -148,6 +154,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			deliveriesCmd,
 			deliveryDetailCmd,
 			spinnerCmd,
+			statusCmd,
 		)
 	}
 }
@@ -222,14 +229,23 @@ func (m Model) View() string {
 		detail,
 	)
 
-	return styles.Container.Render(lipgloss.JoinVertical(
-		lipgloss.Left,
-		headerView,
-		webhooksView,
-		delivery,
-		footerView,
-	),
+	content := styles.Container.Render(
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			headerView,
+			webhooksView,
+			delivery,
+			footerView,
+		),
 	)
+
+	if s := m.status.View(); s != "" {
+		x := m.ctx.WindowWidth/2 - lipgloss.Width(s)/2
+		y := m.ctx.WindowHeight/2 - lipgloss.Height(s)/2
+		content = status.PlaceOverlay(x, y, s, content)
+	}
+
+	return content
 }
 
 func (m *Model) setSizes() {
