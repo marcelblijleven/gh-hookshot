@@ -1,6 +1,6 @@
 package deliveries
 
-type deliveriesFetchMsg struct {
-	Deliveries []hookDeliveryItem
-	Err        error
+type DeliverySelectedMsg struct {
+	HookID     int
+	DeliveryID int
 }

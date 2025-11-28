@@ -18,7 +18,7 @@ func ShowStatus(msg string) tea.Cmd {
 }
 
 func statusTick() tea.Cmd {
-	return tea.Tick(time.Second*2, func(t time.Time) tea.Msg {
+	return tea.Tick(time.Second*3, func(t time.Time) tea.Msg {
 		return statusTickMsg(t)
 	})
 }

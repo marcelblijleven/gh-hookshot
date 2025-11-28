@@ -7,7 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/marcelblijleven/bubbles-hlist/hlist"
-	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/deliveries"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/common"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 )
 
@@ -56,16 +56,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					m.ctx.SelectedWebhookID = hookID
 					return m, tea.Batch(
 						hooksCmd,
-						deliveries.FetchWebhookDeliveriesCmd(
-							m.ctx.Owner,
-							m.ctx.Repo,
-							hookID,
-						),
+						webhookSelectedCmd(hookID),
 					)
 				}
 			}
 		}
-	case webhooksFetchMsg:
+	case common.FetchWebhooksMsg:
 		m.hooksFetched = true
 		if msg.Err != nil {
 			m.err = msg.Err
@@ -74,7 +70,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 		items := make([]hlist.Item, len(msg.Webhooks))
 		for idx, item := range msg.Webhooks {
-			items[idx] = item
+			items[idx] = WebhookItem{Webhook: item}
 		}
 
 		m.hooks.SetItems(items)
@@ -82,7 +78,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 		if item := m.hooks.SelectedItem(); item != nil {
 			m.ctx.SelectedWebhookID = item.(WebhookItem).ID
-			return m, deliveries.FetchWebhookDeliveriesCmd(m.ctx.Owner, m.ctx.Repo, m.ctx.SelectedWebhookID)
+			m.ctx.SelectedDeliveryID = 0
+			return m, webhookSelectedCmd(m.ctx.SelectedWebhookID)
 		}
 
 	}

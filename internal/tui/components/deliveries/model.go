@@ -1,10 +1,12 @@
 package deliveries
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/marcelblijleven/gh-hookshot/internal/tui/components/deliverydetail"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/common"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 )
 
@@ -44,11 +46,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				selectedId := m.deliveries.SelectedItem().(hookDeliveryItem).ID
 				if selectedId != m.ctx.SelectedDeliveryID {
 					m.ctx.SelectedDeliveryID = m.deliveries.SelectedItem().(hookDeliveryItem).ID
-					return m, tea.Batch(listCmd, deliverydetail.FetchWebhookDeliveryDetailCmd(m.ctx.Owner, m.ctx.Repo, m.ctx.SelectedWebhookID, m.ctx.SelectedDeliveryID))
+					return m, tea.Batch(listCmd, deliverySelectedCmd(m.ctx.SelectedWebhookID, m.ctx.SelectedDeliveryID))
 				}
 			}
 		}
-	case deliveriesFetchMsg:
+	case common.FetchDeliveriesMsg:
 		m.deliveriesFetched = true
 		if msg.Err != nil {
 			m.err = msg.Err
@@ -57,15 +59,23 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 		items := make([]list.Item, len(msg.Deliveries))
 		for idx, item := range msg.Deliveries {
-			items[idx] = item
+			items[idx] = hookDeliveryItem{HookDelivery: item}
 		}
 
 		m.deliveries.SetItems(items)
 
+		if len(m.deliveries.Items()) == 0 {
+			m.ctx.SelectedDeliveryID = 0
+			return m, common.SetNoDeliveriesCmd(m.ctx.SelectedWebhookID)
+		}
+
 		if len(m.deliveries.Items()) > 0 && m.deliveries.SelectedItem() != nil {
 			m.ctx.SelectedDeliveryID = m.deliveries.SelectedItem().(hookDeliveryItem).ID
-			return m, deliverydetail.FetchWebhookDeliveryDetailCmd(m.ctx.Owner, m.ctx.Repo, m.ctx.SelectedWebhookID, m.ctx.SelectedDeliveryID)
+			return m, deliverySelectedCmd(m.ctx.SelectedWebhookID, m.ctx.SelectedDeliveryID)
 		}
+	case tea.WindowSizeMsg:
+		fmt.Println("foo", m.ctx.SelectedDeliveryID)
+		return m, nil
 	}
 
 	m.deliveries, listCmd = m.deliveries.Update(msg)
