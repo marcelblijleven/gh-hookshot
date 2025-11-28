@@ -95,3 +95,15 @@ func GetWebhookDeliveryDetail(owner, repo string, hookID, deliveryID int, resp i
 
 	return client.Get(fmt.Sprintf("repos/%s/%s/hooks/%s/deliveries/%s", owner, repo, idStr, deliveryIDStr), &resp)
 }
+
+func RedeliverWebhookDelivery(owner, repo string, hookID, deliveryID int) error {
+	client, err := newRESTClient()
+	if err != nil {
+		return err
+	}
+
+	idStr := strconv.Itoa(hookID)
+	deliveryIDStr := strconv.Itoa(deliveryID)
+
+	return client.Post(fmt.Sprintf("repos/%s/%s/hooks/%s/deliveries/%s/attempts", owner, repo, idStr, deliveryIDStr), nil, nil)
+}

@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/marcelblijleven/gh-hookshot/internal/tui/common"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/styles"
 	"github.com/marcelblijleven/gh-hookshot/internal/tui/tuicontext"
 	"github.com/marcelblijleven/gh-hookshot/internal/util"
@@ -13,15 +14,17 @@ type Model struct {
 	ctx            *tuicontext.Context
 	details        viewport.Model
 	detailsFetched bool
-	rawDetails     hookDeliveryDetailItem
+	rawDetails     *hookDeliveryDetailItem
 	err            error
 }
+
+const noDeliverySelected = "No delivery selected"
 
 var frame = lipgloss.NewStyle().Padding(1)
 
 func New(ctx *tuicontext.Context) Model {
 	vp := viewport.New(0, 0)
-	vp.SetContent("No delivery selected")
+	vp.SetContent(noDeliverySelected)
 
 	return Model{
 		ctx:     ctx,
@@ -37,9 +40,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var viewportCmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case common.NoDeliveriesMsg:
+		m.rawDetails = nil
+		m.details.SetContent(noDeliverySelected)
+		return m, nil
 
-	case deliveryDetailFetchMsg:
+	case common.FetchDeliveryDetailMsg:
 		m.detailsFetched = true
 		if msg.Err != nil {
 			m.err = msg.Err
@@ -53,7 +59,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, nil
 		}
 
-		m.rawDetails = msg.DeliveryDetail
+		m.rawDetails = &hookDeliveryDetailItem{HookDeliveryDetail: msg.DeliveryDetail}
 		m.details.SetContent(details)
 		m.details.SetYOffset(0)
 	}
@@ -68,6 +74,11 @@ func (m Model) View() string {
 func (m *Model) SetSize(width int, height int) {
 	m.details.Width = width
 	m.details.Height = height
+
+	if m.rawDetails == nil {
+		m.details.SetContent(noDeliverySelected)
+		return
+	}
 
 	details, err := util.SyntaxHighlightStruct(m.rawDetails, m.ctx.Theme, m.contentWidth())
 	if err != nil {

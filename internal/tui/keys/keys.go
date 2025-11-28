@@ -9,6 +9,7 @@ type KeyMapping struct {
 	Right     key.Binding
 	HookLeft  key.Binding
 	HookRight key.Binding
+	Redeliver key.Binding
 	Help      key.Binding
 	Quit      key.Binding
 }
@@ -22,7 +23,7 @@ func (k KeyMapping) ShortHelp() []key.Binding {
 func (k KeyMapping) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Up, k.Down, k.Left, k.Right},
-		{k.HookLeft, k.HookRight},
+		{k.HookLeft, k.HookRight, k.Redeliver},
 		{k.Help, k.Quit},
 	}
 }
@@ -51,6 +52,10 @@ var Keys = &KeyMapping{
 	HookRight: key.NewBinding(
 		key.WithKeys("]"),
 		key.WithHelp("]", "move hook right"),
+	),
+	Redeliver: key.NewBinding(
+		key.WithKeys("R"),
+		key.WithHelp("R", "redeliver selected delivery"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
